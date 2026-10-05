@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo Direcionado A1 - Imunologia e Hematopoese</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --text-main: #334155;
+            --text-light: #f8fafc;
+            --accent: #2563eb;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Sidebar Navegação - Previne Overestimulação */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            padding: 0 20px 20px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--sidebar-hover);
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--sidebar-hover);
+            border-left: 4px solid var(--accent);
+        }
+
+        /* Área de Conteúdo Principal */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .topic-section {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .topic-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--sidebar-bg);
+            margin-bottom: 20px;
+        }
+
+        /* Abas Internas: Resumo vs Flashcards */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Estilo do Resumo Textual */
+        .summary-box {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            line-height: 1.6;
+        }
+
+        .summary-box h3 {
+            color: var(--accent);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .summary-box ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .clinical-note {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* Estilo dos Flashcards */
+        .flashcard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .flashcard {
+            background-color: transparent;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .flashcard-front {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .flashcard-back {
+            background-color: var(--accent);
+            color: white;
+            transform: rotateY(180deg);
+            font-size: 1rem;
+        }
+        
+        .hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <h2>Foco A1 - Imunologia</h2>
+        <button class="nav-btn active" onclick="showTopic('hematopoese')">1. Hematopoese</button>
+        <button class="nav-btn" onclick="showTopic('linfoide')">2. Órgãos Linfoides</button>
+        <button class="nav-btn" onclick="showTopic('inflamacao')">3. Inflamação</button>
+        <button class="nav-btn" onclick="showTopic('complemento')">4. Sistema Complemento</button>
+        <button class="nav-btn" onclick="showTopic('adaptativa')">5. Imunidade Adaptativa</button>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="main-content">
+        
+        <!-- TÓPICO 1: Hematopoese -->
+        <div id="hematopoese" class="topic-section active">
+            <h1>Hematopoese</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'hematopoese-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'hematopoese-flash')">Flashcards Interativos</button>
+            </div>
+
+            <div id="hematopoese-resumo" class="tab-content active summary-box">
+                <p>É o processo de formação e desenvolvimento das células do sangue. Todo o processo inicia-se a partir de uma <strong>Célula-Tronco Pluripotente</strong> (CTH) na medula óssea, que se divide em duas linhagens principais:</p>
+                <ul>
+                    <li><strong>Linhagem Mieloide:</strong> Origina hemácias (eritrócitos), plaquetas (via megacariócitos), granulócitos (neutrófilos, eosinófilos, basófilos) e monócitos.</li>
+                    <li><strong>Linhagem Linfoide:</strong> Origina Linfócitos T, Linfócitos B e células NK (Natural Killers).</li>
+                </ul>
+                <div class="clinical-note">
+                    <strong>Correlação Clínica Importante (Reticulócitos):</strong><br>
+                    Reticulócitos são hemácias jovens. A contagem deles no sangue avalia o funcionamento da medula óssea.<br>
+                    - <em>Reticulócitos Altos:</em> Indica que a medula está trabalhando muito para compensar uma perda (ex: hemorragia ou hemólise).<br>
+                    - <em>Reticulócitos Baixos (na presença de anemia):</em> Indica falha na produção (ex: falta de ferro, B12, ou problemas na própria medula).
+                </div>
+            </div>
+
+            <div id="hematopoese-flash" class="tab-content">
+                <p class="hint">Clique nos cartões para revelar a resposta</p>
+                <div class="flashcard-grid">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">O que indica uma contagem elevada de reticulócitos no sangue num quadro de anemia?</div>
+                            <div class="flashcard-back">Indica uma resposta regenerativa da medula óssea, tentando compensar a destruição (hemólise) ou perda (sangramento) de hemácias.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Quais células descendem exclusivamente da linhagem LINFOIDE?</div>
+                            <div class="flashcard-back">Linfócitos T, Linfócitos B e Células NK (Natural Killers).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÓPICO 2: Órgãos Linfoides -->
+        <div id="linfoide" class="topic-section">
+            <h1>Sistema Linfático</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'linfoide-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'linfoide-flash')">Flashcards Interativos</button>
+            </div>
+
+            <div id="linfoide-resumo" class="tab-content active summary-box">
+                <p>O sistema imune organiza seus órgãos com base na função de maturação ou ativação das células.</p>
+                <h3>Órgãos Primários (Geração e Maturação)</h3>
+                <ul>
+                    <li><strong>Medula Óssea:</strong> Onde TODAS as células nascem. É também o local de maturação dos Linfócitos <strong>B</strong>.</li>
+                    <li><strong>Timo:</strong> Local onde os Linfócitos <strong>T</strong> vão para amadurecer (após nascerem na medula). Sofre involução com a idade.</li>
+                </ul>
+                <h3>Órgãos Secundários (Ativação e Encontro com Antígeno)</h3>
+                <ul>
+                    <li><strong>Linfonodos:</strong> Filtram a linfa; é onde os antígenos teciduais são apresentados aos linfócitos.</li>
+                    <li><strong>Baço:</strong> Filtra o sangue; principal local de resposta imune contra infecções sistêmicas (no sangue).</li>
+                    <li><strong>MALT (Tecido Linfoide Associado à Mucosa):</strong> Protege superfícies mucosas (ex: tonsilas, placas de Peyer no intestino).</li>
+                </ul>
+            </div>
+
+            <div id="linfoide-flash" class="tab-content">
+                <p class="hint">Clique nos cartões para revelar a resposta</p>
+                <div class="flashcard-grid">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Qual a diferença funcional entre órgãos linfoides primários e secundários?</div>
+                            <div class="flashcard-back">Primários geram e maturam os linfócitos (Timo e Medula). Secundários são os locais onde os linfócitos encontram os antígenos e são ativados (Baço, Linfonodos).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Qual é o papel principal do Baço no sistema imune?</div>
+                            <div class="flashcard-back">Filtrar antígenos presentes diretamente no sangue (diferente dos linfonodos que filtram a linfa).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÓPICO 3: Inflamação -->
+        <div id="inflamacao" class="topic-section">
+            <h1>Inflamação (Inata)</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'infla-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'infla-flash')">Flashcards Interativos</button>
+            </div>
+
+            <div id="infla-resumo" class="tab-content active summary-box">
+                <h3>Os 5 Sinais Cardinais</h3>
+                <p>Calor (vasodilatação), Rubor (aumento do fluxo sanguíneo), Inchaço/Edema (vazamento de líquido), Dor (pressão e mediadores químicos) e Perda de Função.</p>
+                
+                <h3>Inflamação Aguda vs Crônica</h3>
+                <ul>
+                    <li><strong>Aguda:</strong> Resposta imediata, curta duração. Célula principal: <strong>Neutrófilo</strong>. Presença marcante de exsudato (líquido com alta proteína/células).</li>
+                    <li><strong>Crônica:</strong> Duração prolongada (semanas/anos). Células principais: <strong>Macrófagos e Linfócitos</strong>. Presença de fibrose, angiogênese e destruição tecidual.</li>
+                </ul>
+                
+                <div class="clinical-note">
+                    <strong>Foco Macrófagos (M1 vs M2):</strong><br>
+                    - <em>Macrófago M1:</em> Perfil inflamatório e microbicida. Mata patógenos.<br>
+                    - <em>Macrófago M2:</em> Perfil anti-inflamatório. Foca na cicatrização e reparo do tecido.
+                </div>
+            </div>
+
+            <div id="infla-flash" class="tab-content">
+                <p class="hint">Clique nos cartões para revelar a resposta</p>
+                <div class="flashcard-grid">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Quais são as principais células da Inflamação Aguda e da Crônica, respectivamente?</div>
+                            <div class="flashcard-back">Aguda: Neutrófilos. <br><br>Crônica: Macrófagos e Linfócitos.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Diferencie os perfis de Macrófagos M1 e M2.</div>
+                            <div class="flashcard-back">M1 atua na destruição de patógenos (pró-inflamatório). M2 atua na resolução da inflamação e reparo de tecidos (anti-inflamatório).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÓPICO 4: Sistema Complemento -->
+        <div id="complemento" class="topic-section">
+            <h1>Sistema Complemento</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'comp-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'comp-flash')">Flashcards Interativos</button>
+            </div>
+
+            <div id="comp-resumo" class="tab-content active summary-box">
+                <p>É uma cascata de proteínas plasmáticas inativas que, quando ativadas, amplificam fortemente a resposta imune. Ele possui 3 vias de ativação que convergem para o mesmo final.</p>
+                <h3>As 3 Vias de Ativação</h3>
+                <ul>
+                    <li><strong>Via Clássica:</strong> Ativada pela ligação de um Anticorpo (IgG ou IgM) ao antígeno. (É a ponte entre Imunidade Inata e Adaptativa).</li>
+                    <li><strong>Via Alternativa:</strong> Ativada diretamente pelo contato com componentes da superfície de microrganismos.</li>
+                    <li><strong>Via das Lectinas:</strong> Ativada quando lectinas do plasma se ligam a resíduos de manose na superfície de bactérias.</li>
+                </ul>
+                <h3>Os 3 Objetivos Finais (C3b e MAC)</h3>
+                <ul>
+                    <li><strong>Opsonização:</strong> Proteínas do complemento (como C3b) marcam o patógeno, facilitando a fagocitose.</li>
+                    <li><strong>Inflamação:</strong> Subprodutos recrutam mais células imunes para o local.</li>
+                    <li><strong>Lise Celular (MAC):</strong> O Complexo de Ataque à Membrana cria poros na membrana do patógeno, destruindo-o.</li>
+                </ul>
+            </div>
+
+            <div id="comp-flash" class="tab-content">
+                <p class="hint">Clique nos cartões para revelar a resposta</p>
+                <div class="flashcard-grid">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Qual das vias do Sistema Complemento depende da Imunidade Adaptativa (Anticorpos) para ser ativada?</div>
+                            <div class="flashcard-back">A Via Clássica (ativada pela ligação Antígeno-Anticorpo).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">O que é Opsonização?</div>
+                            <div class="flashcard-back">É o processo de "temperar/marcar" o patógeno com moléculas (como C3b ou anticorpos) para facilitar e acelerar a fagocitose por macrófagos.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÓPICO 5: Imunidade Adaptativa -->
+        <div id="adaptativa" class="topic-section">
+            <h1>Imunidade Adaptativa</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'adap-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'adap-flash')">Flashcards Interativos</button>
+            </div>
+
+            <div id="adap-resumo" class="tab-content active summary-box">
+                <p>Diferente da Inata, a Imunidade Adaptativa é lenta em seu primeiro contato, porém altamente <strong>específica</strong> e cria <strong>memória imunológica</strong>.</p>
+                
+                <h3>Imunidade Humoral (Linfócitos B)</h3>
+                <ul>
+                    <li>Combatem patógenos extracelulares produzindo <strong>Anticorpos (Imunoglobulinas)</strong>.</li>
+                    <li><em>IgM:</em> Primeiro anticorpo a ser produzido (infecção aguda).</li>
+                    <li><em>IgG:</em> Alta afinidade, resposta secundária, atravessa a placenta (memória e proteção prolongada).</li>
+                    <li><em>IgE:</em> Alergias e parasitas.</li>
+                </ul>
+
+                <h3>Imunidade Celular (Linfócitos T)</h3>
+                <ul>
+                    <li>Combatem patógenos intracelulares (vírus, bactérias dentro da célula) e câncer.</li>
+                    <li><strong>Linfócito T CD4+ (Auxiliar/Helper):</strong> O "general" do sistema imune. Coordena a resposta liberando citocinas (é o principal alvo do vírus HIV).</li>
+                    <li><strong>Linfócito T CD8+ (Citotóxico):</strong> O "soldado". Identifica e induz apoptose (morte celular programada) em células infectadas.</li>
+                </ul>
+            </div>
+
+            <div id="adap-flash" class="tab-content">
+                <p class="hint">Clique nos cartões para revelar a resposta</p>
+                <div class="flashcard-grid">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Diferencie a ação do Linfócito T CD4+ e do Linfócito T CD8+.</div>
+                            <div class="flashcard-back">CD4+ (Auxiliar): Coordena e ativa outras células do sistema imune via citocinas.<br><br>CD8+ (Citotóxico): Mata diretamente células infectadas por vírus ou tumorais.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Na sorologia, o que significa ter IgM reagente e IgG não reagente?</div>
+                            <div class="flashcard-back">Indica uma infecção aguda (recente), pois o IgM é o primeiro anticorpo produzido antes que ocorra a troca de classe para IgG (fase de memória).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script de Interação -->
+    <script>
+        // Função para alternar os tópicos no menu lateral
+        function showTopic(topicId) {
+            // Esconde todas as seções
+            document.querySelectorAll('.topic-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove a classe 'active' de todos os botões do menu lateral
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostra a seção escolhida e marca o botão correspondente
+            document.getElementById(topicId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Função para alternar entre Resumo e Flashcard dentro de um tópico
+        function switchTab(btn, targetId) {
+            const tabsContainer = btn.parentElement;
+            const topicSection = tabsContainer.parentElement;
+
+            // Remove active dos botões (dentro deste tópico)
+            tabsContainer.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+
+            // Esconde todo o conteúdo de aba (dentro deste tópico)
+            topicSection.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Ativa o botão clicado e a aba correspondente
+            btn.classList.add('active');
+            document.getElementById(targetId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
