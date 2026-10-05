@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudo Direcionado A1 - Imunologia e Hematopoese</title>
+    <title>Estudo Direcionado A1 - Imunologia Completa</title>
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -14,6 +14,8 @@
             --accent: #2563eb;
             --card-bg: #ffffff;
             --border: #e2e8f0;
+            --correct: #22c55e;
+            --wrong: #ef4444;
         }
 
         * {
@@ -30,7 +32,7 @@
             color: var(--text-main);
         }
 
-        /* Sidebar Navegação - Previne Overestimulação */
+        /* Sidebar Navegação */
         .sidebar {
             width: 280px;
             background-color: var(--sidebar-bg);
@@ -39,6 +41,7 @@
             flex-direction: column;
             padding: 20px 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         .sidebar h2 {
@@ -93,9 +96,10 @@
             margin-bottom: 20px;
         }
 
-        /* Abas Internas: Resumo vs Flashcards */
+        /* Abas Internas */
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 30px;
             border-bottom: 2px solid var(--border);
@@ -111,6 +115,10 @@
             font-weight: bold;
             color: var(--text-main);
             transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background-color: #e2e8f0;
         }
 
         .tab-btn.active {
@@ -138,13 +146,19 @@
 
         .summary-box h3 {
             color: var(--accent);
-            margin-top: 20px;
+            margin-top: 25px;
             margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
         }
 
         .summary-box ul {
             margin-left: 20px;
             margin-bottom: 15px;
+        }
+
+        .summary-box li {
+            margin-bottom: 8px;
         }
 
         .clinical-note {
@@ -164,7 +178,7 @@
 
         .flashcard {
             background-color: transparent;
-            height: 200px;
+            height: 220px;
             perspective: 1000px;
             cursor: pointer;
         }
@@ -194,6 +208,7 @@
             justify-content: center;
             padding: 20px;
             border-radius: 8px;
+            line-height: 1.4;
         }
 
         .flashcard-front {
@@ -209,14 +224,83 @@
             color: white;
             transform: rotateY(180deg);
             font-size: 1rem;
+            overflow-y: auto;
         }
         
         .hint {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #64748b;
             margin-bottom: 20px;
             text-align: center;
+            font-style: italic;
         }
+
+        /* Estilo dos Quizzes */
+        .quiz-container {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--sidebar-bg);
+        }
+
+        .quiz-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .quiz-btn:hover:not(:disabled) {
+            background-color: #e2e8f0;
+        }
+
+        .quiz-btn.correct {
+            background-color: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+
+        .quiz-btn.wrong {
+            background-color: var(--wrong);
+            color: white;
+            border-color: var(--wrong);
+        }
+
+        .quiz-btn:disabled {
+            cursor: default;
+        }
+
+        .quiz-explanation {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--sidebar-bg);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .quiz-explanation.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
     </style>
 </head>
 <body>
@@ -226,269 +310,520 @@
         <h2>Foco A1 - Imunologia</h2>
         <button class="nav-btn active" onclick="showTopic('hematopoese')">1. Hematopoese</button>
         <button class="nav-btn" onclick="showTopic('linfoide')">2. Órgãos Linfoides</button>
-        <button class="nav-btn" onclick="showTopic('inflamacao')">3. Inflamação</button>
+        <button class="nav-btn" onclick="showTopic('inflamacao')">3. Inflamação (Inata)</button>
         <button class="nav-btn" onclick="showTopic('complemento')">4. Sistema Complemento</button>
-        <button class="nav-btn" onclick="showTopic('adaptativa')">5. Imunidade Adaptativa</button>
+        <button class="nav-btn" onclick="showTopic('adaptativa')">5. Imun. Adaptativa</button>
     </div>
 
     <!-- Conteúdo -->
     <div class="main-content">
         
-        <!-- TÓPICO 1: Hematopoese -->
+        <!-- ==============================================
+             TÓPICO 1: HEMATOPOESE
+        =============================================== -->
         <div id="hematopoese" class="topic-section active">
             <h1>Hematopoese</h1>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab(this, 'hematopoese-resumo')">Resumo Dinâmico</button>
-                <button class="tab-btn" onclick="switchTab(this, 'hematopoese-flash')">Flashcards Interativos</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'hemato-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'hemato-flash')">Flashcards</button>
+                <button class="tab-btn" onclick="switchTab(this, 'hemato-quiz')">Quiz</button>
             </div>
 
-            <div id="hematopoese-resumo" class="tab-content active summary-box">
-                <p>É o processo de formação e desenvolvimento das células do sangue. Todo o processo inicia-se a partir de uma <strong>Célula-Tronco Pluripotente</strong> (CTH) na medula óssea, que se divide em duas linhagens principais:</p>
+            <!-- Resumo -->
+            <div id="hemato-resumo" class="tab-content active summary-box">
+                <p>A hematopoese é a renovação contínua das células do sangue. Todo o processo inicia-se a partir da <strong>Célula-Tronco Hematopoética (CTH) Pluripotente</strong> na medula óssea, que possui capacidade de autorrenovação e diferenciação.</p>
+                
+                <h3>As Duas Linhagens Principais</h3>
                 <ul>
-                    <li><strong>Linhagem Mieloide:</strong> Origina hemácias (eritrócitos), plaquetas (via megacariócitos), granulócitos (neutrófilos, eosinófilos, basófilos) e monócitos.</li>
-                    <li><strong>Linhagem Linfoide:</strong> Origina Linfócitos T, Linfócitos B e células NK (Natural Killers).</li>
+                    <li><strong>Linhagem Mieloide (Progenitor Mieloide Comum):</strong> Origina Hemácias (eritrócitos), Plaquetas (através dos megacariócitos), Monócitos (que viram macrófagos no tecido) e Granulócitos (Neutrófilos, Eosinófilos, Basófilos).</li>
+                    <li><strong>Linhagem Linfoide (Progenitor Linfoide Comum):</strong> Origina Linfócitos T, Linfócitos B e células NK (Natural Killers).</li>
                 </ul>
+
+                <h3>Fatores de Crescimento (Citocinas Hematopoéticas)</h3>
+                <ul>
+                    <li><strong>Eritropoetina (EPO):</strong> Produzida nos rins, estimula a produção de hemácias.</li>
+                    <li><strong>Trombopoetina (TPO):</strong> Produzida no fígado, estimula a formação de plaquetas.</li>
+                    <li><strong>Fatores Estimuladores de Colônias (G-CSF, M-CSF):</strong> Estimulam a produção de leucócitos (ex: neutrófilos, monócitos) durante infecções.</li>
+                </ul>
+
                 <div class="clinical-note">
-                    <strong>Correlação Clínica Importante (Reticulócitos):</strong><br>
-                    Reticulócitos são hemácias jovens. A contagem deles no sangue avalia o funcionamento da medula óssea.<br>
-                    - <em>Reticulócitos Altos:</em> Indica que a medula está trabalhando muito para compensar uma perda (ex: hemorragia ou hemólise).<br>
-                    - <em>Reticulócitos Baixos (na presença de anemia):</em> Indica falha na produção (ex: falta de ferro, B12, ou problemas na própria medula).
+                    <strong>Correlação Clínica: Desvios e Reticulócitos</strong><br>
+                    - <em>Reticulocitose (Altos):</em> A medula responde a uma anemia (ex: sangramento) jogando células jovens no sangue.<br>
+                    - <em>Desvio à Esquerda:</em> Aumento de neutrófilos jovens (bastões) no sangue periférico. É um forte indicativo de infecção bacteriana aguda, pois a medula está liberando os "soldados recrutas" às pressas.
                 </div>
             </div>
 
-            <div id="hematopoese-flash" class="tab-content">
+            <!-- Flashcards -->
+            <div id="hemato-flash" class="tab-content">
                 <p class="hint">Clique nos cartões para revelar a resposta</p>
                 <div class="flashcard-grid">
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">O que indica uma contagem elevada de reticulócitos no sangue num quadro de anemia?</div>
-                            <div class="flashcard-back">Indica uma resposta regenerativa da medula óssea, tentando compensar a destruição (hemólise) ou perda (sangramento) de hemácias.</div>
+                            <div class="flashcard-front">O que caracteriza um "Desvio à Esquerda" no hemograma?</div>
+                            <div class="flashcard-back">Presença aumentada de formas imaturas de neutrófilos (como os bastonetes) no sangue periférico, indicando resposta aguda, geralmente infecção bacteriana.</div>
                         </div>
                     </div>
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Quais células descendem exclusivamente da linhagem LINFOIDE?</div>
-                            <div class="flashcard-back">Linfócitos T, Linfócitos B e Células NK (Natural Killers).</div>
+                            <div class="flashcard-front">Onde a Eritropoetina (EPO) é produzida e qual sua função?</div>
+                            <div class="flashcard-back">É produzida principalmente nos RINS. Sua função é estimular a medula óssea a produzir e maturar eritroblastos em hemácias.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">As plaquetas são células? De qual célula elas se originam?</div>
+                            <div class="flashcard-back">As plaquetas NÃO são células completas, são fragmentos citoplasmáticos. Elas se originam da fragmentação do Megacariócito (linhagem mieloide).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">O Monócito pertence a qual linhagem e no que ele se transforma nos tecidos?</div>
+                            <div class="flashcard-back">Pertence à linhagem MIELOIDE. Quando o monócito sai do sangue e entra nos tecidos, ele se diferencia em MACRÓFAGO.</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Quiz -->
+            <div id="hemato-quiz" class="tab-content">
+                <div class="quiz-container">
+                    <p class="quiz-question">1. Paciente com insuficiência renal crônica grave frequentemente desenvolve anemia severa. Qual é a principal causa fisiológica dessa anemia ligada à hematopoese?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Falta de produção de Trombopoetina pelo fígado.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) Destruição excessiva de hemácias no baço.</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">C) Deficiência na produção de Eritropoetina (EPO) pelos rins.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Falha na célula-tronco linfoide na medula óssea.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> A Eritropoetina (EPO) é o hormônio vital para a diferenciação dos eritrócitos (hemácias) e é produzida quase exclusivamente nos rins. Rins doentes = menos EPO = anemia.</div>
+                </div>
+
+                <div class="quiz-container">
+                    <p class="quiz-question">2. Todas as células a seguir são derivadas do Progenitor Mieloide Comum, EXCETO:</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Eosinófilo</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) Megacariócito</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">C) Célula NK (Natural Killer)</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Monócito</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> Células NK, junto com Linfócitos T e B, pertencem à linhagem LINFOIDE, não mieloide.</div>
+                </div>
+            </div>
         </div>
 
-        <!-- TÓPICO 2: Órgãos Linfoides -->
+        <!-- ==============================================
+             TÓPICO 2: SISTEMA LINFÁTICO
+        =============================================== -->
         <div id="linfoide" class="topic-section">
-            <h1>Sistema Linfático</h1>
+            <h1>Órgãos Linfoides</h1>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab(this, 'linfoide-resumo')">Resumo Dinâmico</button>
-                <button class="tab-btn" onclick="switchTab(this, 'linfoide-flash')">Flashcards Interativos</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'linf-resumo')">Resumo Dinâmico</button>
+                <button class="tab-btn" onclick="switchTab(this, 'linf-flash')">Flashcards</button>
+                <button class="tab-btn" onclick="switchTab(this, 'linf-quiz')">Quiz</button>
             </div>
 
-            <div id="linfoide-resumo" class="tab-content active summary-box">
-                <p>O sistema imune organiza seus órgãos com base na função de maturação ou ativação das células.</p>
+            <!-- Resumo -->
+            <div id="linf-resumo" class="tab-content active summary-box">
                 <h3>Órgãos Primários (Geração e Maturação)</h3>
+                <p>Locais onde os linfócitos são gerados e adquirem seus receptores (TCR ou BCR), sem contato com antígenos externos.</p>
                 <ul>
-                    <li><strong>Medula Óssea:</strong> Onde TODAS as células nascem. É também o local de maturação dos Linfócitos <strong>B</strong>.</li>
-                    <li><strong>Timo:</strong> Local onde os Linfócitos <strong>T</strong> vão para amadurecer (após nascerem na medula). Sofre involução com a idade.</li>
+                    <li><strong>Medula Óssea:</strong> Origem de todas as células imunes. Maturação final dos Linfócitos <strong>B</strong>.</li>
+                    <li><strong>Timo:</strong> Local de maturação dos Linfócitos <strong>T</strong>. Possui uma região cortical (córtex) densa em timócitos imaturos, e uma região medular com células mais maduras. Sofre involução com o envelhecimento.</li>
                 </ul>
-                <h3>Órgãos Secundários (Ativação e Encontro com Antígeno)</h3>
+
+                <h3>Órgãos Secundários (Ativação e Expansão)</h3>
+                <p>Locais estratégicos onde linfócitos maduros encontram os antígenos e disparam a resposta imune.</p>
                 <ul>
-                    <li><strong>Linfonodos:</strong> Filtram a linfa; é onde os antígenos teciduais são apresentados aos linfócitos.</li>
-                    <li><strong>Baço:</strong> Filtra o sangue; principal local de resposta imune contra infecções sistêmicas (no sangue).</li>
-                    <li><strong>MALT (Tecido Linfoide Associado à Mucosa):</strong> Protege superfícies mucosas (ex: tonsilas, placas de Peyer no intestino).</li>
+                    <li><strong>Linfonodos:</strong> Filtram a <em>linfa</em> drenada dos tecidos. Dividem-se em Córtex (rico em Linfócitos B), Paracórtex (rico em Linfócitos T) e Medula (plasmócitos secretando anticorpos).</li>
+                    <li><strong>Baço:</strong> Órgão altamente vascularizado. Filtra o <em>sangue</em> (protege contra infecções sistêmicas/sepses).
+                        <ul>
+                            <li><em>Polpa Branca:</em> Tecido linfoide rico em linfócitos (ativação imune).</li>
+                            <li><em>Polpa Vermelha:</em> Filtração de hemácias velhas (hemocaterese) e reserva de macrófagos.</li>
+                        </ul>
+                    </li>
+                    <li><strong>MALT (Tecido Linfoide Associado à Mucosa):</strong> Tonsilas, Placas de Peyer, Apêndice. Protegem os tratos respiratório, gastrointestinal e geniturinário.</li>
                 </ul>
             </div>
 
-            <div id="linfoide-flash" class="tab-content">
+            <!-- Flashcards -->
+            <div id="linf-flash" class="tab-content">
                 <p class="hint">Clique nos cartões para revelar a resposta</p>
                 <div class="flashcard-grid">
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Qual a diferença funcional entre órgãos linfoides primários e secundários?</div>
-                            <div class="flashcard-back">Primários geram e maturam os linfócitos (Timo e Medula). Secundários são os locais onde os linfócitos encontram os antígenos e são ativados (Baço, Linfonodos).</div>
+                            <div class="flashcard-front">O que acontece com o Timo com o avanço da idade?</div>
+                            <div class="flashcard-back">O timo sofre involução (atrofia progressiva), sendo substituído por tecido adiposo, reduzindo a produção de novos Linfócitos T naïves.</div>
                         </div>
                     </div>
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Qual é o papel principal do Baço no sistema imune?</div>
-                            <div class="flashcard-back">Filtrar antígenos presentes diretamente no sangue (diferente dos linfonodos que filtram a linfa).</div>
+                            <div class="flashcard-front">Diferencie a função da Polpa Branca e da Polpa Vermelha do Baço.</div>
+                            <div class="flashcard-back">Polpa Branca atua na resposta imunológica (rica em linfócitos, combatendo infecções do sangue). Polpa Vermelha atua na remoção de hemácias velhas/danificadas (hemocaterese).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Onde os Linfócitos B e Linfócitos T amadurecem, respectivamente?</div>
+                            <div class="flashcard-back">Linfócitos B amadurecem na Medula Óssea (B de Bone marrow). Linfócitos T amadurecem no Timo (T de Timo).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">No linfonodo, qual a região rica em Linfócitos B e folículos, e qual a região rica em Linfócitos T?</div>
+                            <div class="flashcard-back">Córtex é rico em folículos (Linfócitos B). Paracórtex é a região de células T.</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Quiz -->
+            <div id="linf-quiz" class="tab-content">
+                <div class="quiz-container">
+                    <p class="quiz-question">1. Um paciente sofreu um trauma abdominal e precisou remover o baço (esplenectomia). Qual destas funções ficará MAIS prejudicada?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) A maturação de linfócitos T.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) A filtração da linfa de todo o corpo.</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">C) A depuração de antígenos que circulam no sangue e a remoção de hemácias velhas.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) A produção de células-tronco hematopoéticas no adulto.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> O baço é o órgão secundário responsável por filtrar diretamente o sangue (capturando bactérias circulantes) e destruir hemácias velhas (Polpa vermelha). Pacientes sem baço têm alto risco de infecções sistêmicas graves (sepse).</div>
+                </div>
+                <div class="quiz-container">
+                    <p class="quiz-question">2. O tecido linfoide associado à mucosa (MALT) é essencial para proteger qual tipo de área anatômica?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Tecido ósseo e cartilaginoso.</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">B) Tratos gastrointestinal, respiratório e geniturinário.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">C) Exclusivamente o sistema nervoso central.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) O sistema cardiovascular e o coração.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> MALT protege as "portas de entrada" do corpo em contato constante com o ambiente externo: mucosas do intestino (placas de Peyer), pulmão e vias urinárias.</div>
+                </div>
+            </div>
         </div>
 
-        <!-- TÓPICO 3: Inflamação -->
+        <!-- ==============================================
+             TÓPICO 3: INFLAMAÇÃO
+        =============================================== -->
         <div id="inflamacao" class="topic-section">
             <h1>Inflamação (Inata)</h1>
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab(this, 'infla-resumo')">Resumo Dinâmico</button>
-                <button class="tab-btn" onclick="switchTab(this, 'infla-flash')">Flashcards Interativos</button>
+                <button class="tab-btn" onclick="switchTab(this, 'infla-flash')">Flashcards</button>
+                <button class="tab-btn" onclick="switchTab(this, 'infla-quiz')">Quiz</button>
             </div>
 
+            <!-- Resumo -->
             <div id="infla-resumo" class="tab-content active summary-box">
-                <h3>Os 5 Sinais Cardinais</h3>
-                <p>Calor (vasodilatação), Rubor (aumento do fluxo sanguíneo), Inchaço/Edema (vazamento de líquido), Dor (pressão e mediadores químicos) e Perda de Função.</p>
+                <p>A inflamação é uma resposta vascular e celular vital para levar células de defesa e proteínas ao local da infecção ou lesão.</p>
                 
-                <h3>Inflamação Aguda vs Crônica</h3>
+                <h3>Os 5 Sinais Cardinais e suas Causas Fisiológicas</h3>
                 <ul>
-                    <li><strong>Aguda:</strong> Resposta imediata, curta duração. Célula principal: <strong>Neutrófilo</strong>. Presença marcante de exsudato (líquido com alta proteína/células).</li>
-                    <li><strong>Crônica:</strong> Duração prolongada (semanas/anos). Células principais: <strong>Macrófagos e Linfócitos</strong>. Presença de fibrose, angiogênese e destruição tecidual.</li>
+                    <li><strong>Calor e Rubor:</strong> Devido à <em>vasodilatação</em> induzida por histamina e prostaglandinas (maior fluxo sanguíneo).</li>
+                    <li><strong>Edema (Inchaço):</strong> Devido ao aumento da <em>permeabilidade vascular</em> (vazamento de plasma rico em proteínas para o tecido).</li>
+                    <li><strong>Dor:</strong> Compressão nervosa pelo edema e ação direta de mediadores químicos (bradicinina, prostaglandinas).</li>
+                    <li><strong>Perda de Função:</strong> Consequência da dor e destruição tecidual grave.</li>
                 </ul>
+
+                <h3>Fases da Diapedese (Extravasamento Celular)</h3>
+                <p>Como os neutrófilos saem do vaso para o tecido lesionado:</p>
+                <ol>
+                    <li><strong>Marginação e Rolamento:</strong> Neutrófilo rola no endotélio mediado por <em>Selectinas</em>.</li>
+                    <li><strong>Adesão Firme:</strong> Neutrófilo gruda firmemente através de <em>Integrinas</em>.</li>
+                    <li><strong>Transmigração (Diapedese):</strong> Atravessa as células endoteliais.</li>
+                    <li><strong>Quimiotaxia:</strong> Navega até a bactéria guiado por sinais químicos (ex: quimiocinas, C5a).</li>
+                </ol>
                 
                 <div class="clinical-note">
-                    <strong>Foco Macrófagos (M1 vs M2):</strong><br>
-                    - <em>Macrófago M1:</em> Perfil inflamatório e microbicida. Mata patógenos.<br>
-                    - <em>Macrófago M2:</em> Perfil anti-inflamatório. Foca na cicatrização e reparo do tecido.
+                    <strong>Macrófagos (M1 vs M2):</strong><br>
+                    Na inflamação, o Macrófago <strong>M1</strong> atua como o "destruidor", produzindo citocinas pró-inflamatórias (TNF, IL-1) e matando bactérias.<br>
+                    O Macrófago <strong>M2</strong> age depois, sendo o "reparador", liberando citocinas anti-inflamatórias (IL-10, TGF-beta) para promover fibrose e angiogênese (cicatrização).
                 </div>
             </div>
 
+            <!-- Flashcards -->
             <div id="infla-flash" class="tab-content">
                 <p class="hint">Clique nos cartões para revelar a resposta</p>
                 <div class="flashcard-grid">
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Quais são as principais células da Inflamação Aguda e da Crônica, respectivamente?</div>
-                            <div class="flashcard-back">Aguda: Neutrófilos. <br><br>Crônica: Macrófagos e Linfócitos.</div>
+                            <div class="flashcard-front">O que causa o Edema (inchaço) durante a inflamação aguda?</div>
+                            <div class="flashcard-back">O aumento da permeabilidade vascular local, o que permite o extravasamento de um líquido rico em proteínas e células (exsudato) do vaso para o tecido intersticial.</div>
                         </div>
                     </div>
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Diferencie os perfis de Macrófagos M1 e M2.</div>
-                            <div class="flashcard-back">M1 atua na destruição de patógenos (pró-inflamatório). M2 atua na resolução da inflamação e reparo de tecidos (anti-inflamatório).</div>
+                            <div class="flashcard-front">O que é Quimiotaxia?</div>
+                            <div class="flashcard-back">É o movimento direcionado dos leucócitos (ex: neutrófilos) em direção ao local da lesão ou infecção, guiado por um gradiente de moléculas atraentes (quimiocinas, C5a).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Quais os principais mediadores da Dor na resposta inflamatória?</div>
+                            <div class="flashcard-back">Prostaglandinas e Bradicinina, além da pressão física gerada pelo próprio edema sobre os nervos.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Qual a principal molécula de adesão envolvida no "Rolamento" e na "Adesão Firme", respectivamente?</div>
+                            <div class="flashcard-back">Rolamento é mediado por Selectinas (ligação fraca).<br>Adesão firme é mediada por Integrinas (ligação forte).</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Quiz -->
+            <div id="infla-quiz" class="tab-content">
+                <div class="quiz-container">
+                    <p class="quiz-question">1. Qual dos conjuntos abaixo representa a sequência cronológica correta dos eventos celulares (extravasamento leucocitário) na inflamação aguda?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Quimiotaxia > Adesão firme > Rolamento > Marginação</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">B) Marginação > Rolamento > Adesão firme > Transmigração > Quimiotaxia</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">C) Transmigração > Rolamento > Quimiotaxia > Adesão firme</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Adesão firme > Marginação > Quimiotaxia > Rolamento</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> A ordem fisiológica é: a célula encosta na parede (marginação), rola via selectinas (rolamento), para firmemente via integrinas (adesão firme), espreme-se pelas células do vaso (transmigração/diapedese) e segue o rastro químico até a bactéria (quimiotaxia).</div>
+                </div>
+                <div class="quiz-container">
+                    <p class="quiz-question">2. Sobre inflamação aguda e crônica, assinale a alternativa incorreta:</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) O Neutrófilo é a célula marcante e inicial da inflamação aguda.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) A inflamação crônica frequentemente envolve macrófagos e linfócitos.</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">C) O macrófago com perfil M2 tem papel microbicida severo, intensificando a destruição tecidual local.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Vasodilatação é uma das primeiras respostas vasculares em uma agressão aguda.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> A C está incorreta (é a resposta do quiz). O macrófago microbicida pró-inflamatório é o M1. O perfil M2 é imunorregulador e atua na reparação tecidual, angiogênese e cicatrização.</div>
+                </div>
+            </div>
         </div>
 
-        <!-- TÓPICO 4: Sistema Complemento -->
+        <!-- ==============================================
+             TÓPICO 4: SISTEMA COMPLEMENTO
+        =============================================== -->
         <div id="complemento" class="topic-section">
             <h1>Sistema Complemento</h1>
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab(this, 'comp-resumo')">Resumo Dinâmico</button>
-                <button class="tab-btn" onclick="switchTab(this, 'comp-flash')">Flashcards Interativos</button>
+                <button class="tab-btn" onclick="switchTab(this, 'comp-flash')">Flashcards</button>
+                <button class="tab-btn" onclick="switchTab(this, 'comp-quiz')">Quiz</button>
             </div>
 
+            <!-- Resumo -->
             <div id="comp-resumo" class="tab-content active summary-box">
-                <p>É uma cascata de proteínas plasmáticas inativas que, quando ativadas, amplificam fortemente a resposta imune. Ele possui 3 vias de ativação que convergem para o mesmo final.</p>
-                <h3>As 3 Vias de Ativação</h3>
+                <p>Composto por >30 proteínas plasmáticas (sintetizadas no fígado) que circulam inativas. A ativação ocorre em "cascata" e resulta na lise do patógeno e forte inflamação.</p>
+                
+                <h3>Três Vias de Ativação</h3>
                 <ul>
-                    <li><strong>Via Clássica:</strong> Ativada pela ligação de um Anticorpo (IgG ou IgM) ao antígeno. (É a ponte entre Imunidade Inata e Adaptativa).</li>
-                    <li><strong>Via Alternativa:</strong> Ativada diretamente pelo contato com componentes da superfície de microrganismos.</li>
-                    <li><strong>Via das Lectinas:</strong> Ativada quando lectinas do plasma se ligam a resíduos de manose na superfície de bactérias.</li>
+                    <li><strong>Via Alternativa:</strong> Ativação espontânea que se estabiliza ao tocar em superfícies bacterianas (LPS, parede celular).</li>
+                    <li><strong>Via das Lectinas:</strong> Lectina Ligadora de Manose (MBL) do plasma se liga a açúcares (manose) presentes apenas em microrganismos.</li>
+                    <li><strong>Via Clássica:</strong> Depende de anticorpos adaptativos. Ativada quando C1q se liga a um complexo Antígeno-Anticorpo (IgM ou IgG).</li>
                 </ul>
-                <h3>Os 3 Objetivos Finais (C3b e MAC)</h3>
+
+                <h3>O Ponto de Convergência: C3 Convertase</h3>
+                <p>Todas as 3 vias convergem na formação da enzima <strong>C3 convertase</strong>, que quebra a proteína C3 em duas frações:</p>
                 <ul>
-                    <li><strong>Opsonização:</strong> Proteínas do complemento (como C3b) marcam o patógeno, facilitando a fagocitose.</li>
-                    <li><strong>Inflamação:</strong> Subprodutos recrutam mais células imunes para o local.</li>
-                    <li><strong>Lise Celular (MAC):</strong> O Complexo de Ataque à Membrana cria poros na membrana do patógeno, destruindo-o.</li>
+                    <li><strong>C3a (Anafilatoxina):</strong> Vai atuar nos vasos causando intensa inflamação e recrutamento celular (junto com o C5a).</li>
+                    <li><strong>C3b (Opsonina):</strong> Gruda na bactéria, facilitando imensamente sua fagocitose por macrófagos (opsonização).</li>
                 </ul>
+
+                <h3>O Gran Finale: MAC (Complexo de Ataque à Membrana)</h3>
+                <p>A cascata finaliza ativando C5, C6, C7, C8 e vários C9, que formam um poro na membrana do patógeno (o MAC). A água entra e a bactéria explode por lise osmótica.</p>
             </div>
 
+            <!-- Flashcards -->
             <div id="comp-flash" class="tab-content">
                 <p class="hint">Clique nos cartões para revelar a resposta</p>
                 <div class="flashcard-grid">
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Qual das vias do Sistema Complemento depende da Imunidade Adaptativa (Anticorpos) para ser ativada?</div>
-                            <div class="flashcard-back">A Via Clássica (ativada pela ligação Antígeno-Anticorpo).</div>
+                            <div class="flashcard-front">O que faz o Complexo de Ataque à Membrana (MAC) e quais proteínas o compõem?</div>
+                            <div class="flashcard-back">Cria poros na membrana celular de microrganismos, causando lise osmótica (explosão celular). É formado pelas proteínas C5b, C6, C7, C8 e C9.</div>
                         </div>
                     </div>
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">O que é Opsonização?</div>
-                            <div class="flashcard-back">É o processo de "temperar/marcar" o patógeno com moléculas (como C3b ou anticorpos) para facilitar e acelerar a fagocitose por macrófagos.</div>
+                            <div class="flashcard-front">Qual a função vital da fração C3b do Complemento?</div>
+                            <div class="flashcard-back">Opsonização. O C3b recobre a superfície do patógeno, tornando-o um alvo "delicioso" e facilmente reconhecido pelos receptores dos fagócitos.</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">C3a e C5a têm ação semelhante. Como são chamadas e o que fazem?</div>
+                            <div class="flashcard-back">São chamadas de Anafilatoxinas. Elas promovem intensa inflamação local, causando vasodilatação e atuando como potentes quimioatraentes para leucócitos (quimiotaxia).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Quais anticorpos são capazes de ativar a Via Clássica do sistema complemento?</div>
+                            <div class="flashcard-back">IgM (o mais eficiente) e IgG.</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Quiz -->
+            <div id="comp-quiz" class="tab-content">
+                <div class="quiz-container">
+                    <p class="quiz-question">1. O sistema complemento pode ser ativado por três vias distintas. Qual dessas vias exige imunidade adaptativa prévia (presença de anticorpos) para ser ativada?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Via Alternativa</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">B) Via Clássica</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">C) Via das Lectinas</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Via da C3 convertase</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> A Via Clássica depende do reconhecimento pela proteína C1 de anticorpos da classe IgM ou IgG que já estejam ligados a um antígeno. As vias Alternativa e Lectinas são respostas inatas puras.</div>
+                </div>
+                <div class="quiz-container">
+                    <p class="quiz-question">2. Durante a cascata do complemento, há a clivagem da molécula C3 em C3a e C3b. Qual é a principal função da fração C3b?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Causar vasodilatação e broncoconstrição atuando como anafilatoxina.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) Induzir a ativação de Linfócitos T CD8.</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">C) Agir como opsonina, ligando-se à superfície bacteriana e facilitando a fagocitose.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Formar diretamente o poro transmembrana (MAC) isoladamente.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> C3b atua fixando-se covalentemente no patógeno, processo chamado Opsonização. Os macrófagos possuem receptores específicos para C3b, fagocitando o alvo rapidamente. C3a (e não C3b) atua na vasodilatação (A). O poro (MAC) é formado de C5b a C9 (D).</div>
+                </div>
+            </div>
         </div>
 
-        <!-- TÓPICO 5: Imunidade Adaptativa -->
+        <!-- ==============================================
+             TÓPICO 5: IMUNIDADE ADAPTATIVA
+        =============================================== -->
         <div id="adaptativa" class="topic-section">
             <h1>Imunidade Adaptativa</h1>
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab(this, 'adap-resumo')">Resumo Dinâmico</button>
-                <button class="tab-btn" onclick="switchTab(this, 'adap-flash')">Flashcards Interativos</button>
+                <button class="tab-btn" onclick="switchTab(this, 'adap-flash')">Flashcards</button>
+                <button class="tab-btn" onclick="switchTab(this, 'adap-quiz')">Quiz</button>
             </div>
 
+            <!-- Resumo -->
             <div id="adap-resumo" class="tab-content active summary-box">
-                <p>Diferente da Inata, a Imunidade Adaptativa é lenta em seu primeiro contato, porém altamente <strong>específica</strong> e cria <strong>memória imunológica</strong>.</p>
+                <p>É caracterizada pela alta <strong>especificidade</strong> e formação de <strong>memória imunológica</strong>. Depende da apresentação de antígenos para ser ativada.</p>
                 
-                <h3>Imunidade Humoral (Linfócitos B)</h3>
+                <h3>Apresentação de Antígenos e MHC</h3>
                 <ul>
-                    <li>Combatem patógenos extracelulares produzindo <strong>Anticorpos (Imunoglobulinas)</strong>.</li>
-                    <li><em>IgM:</em> Primeiro anticorpo a ser produzido (infecção aguda).</li>
-                    <li><em>IgG:</em> Alta afinidade, resposta secundária, atravessa a placenta (memória e proteção prolongada).</li>
-                    <li><em>IgE:</em> Alergias e parasitas.</li>
+                    <li><strong>Célula Dendrítica (APC Profissional):</strong> Captura o antígeno na periferia e migra para o linfonodo para apresentá-lo ao Linfócito T ingênuo.</li>
+                    <li><strong>MHC Classe I:</strong> Presente em todas as células nucleadas do corpo. Mostra antígenos <em>intracelulares</em> (vírus, tumores) para os Linfócitos T CD8+.</li>
+                    <li><strong>MHC Classe II:</strong> Presente apenas em APCs (dendríticas, macrófagos, células B). Mostra antígenos <em>extracelulares</em> fagocitados para os Linfócitos T CD4+.</li>
                 </ul>
 
-                <h3>Imunidade Celular (Linfócitos T)</h3>
+                <h3>Celular vs Humoral</h3>
                 <ul>
-                    <li>Combatem patógenos intracelulares (vírus, bactérias dentro da célula) e câncer.</li>
-                    <li><strong>Linfócito T CD4+ (Auxiliar/Helper):</strong> O "general" do sistema imune. Coordena a resposta liberando citocinas (é o principal alvo do vírus HIV).</li>
-                    <li><strong>Linfócito T CD8+ (Citotóxico):</strong> O "soldado". Identifica e induz apoptose (morte celular programada) em células infectadas.</li>
+                    <li><strong>Imunidade Celular (Linfócitos T):</strong>
+                        <ul>
+                            <li><em>Linfócito T CD4+ (Helper/Auxiliar):</em> Reconhece MHC-II. Produz citocinas que coordenam macrófagos, linfócitos B e CD8. "Maestro".</li>
+                            <li><em>Linfócito T CD8+ (Citotóxico):</em> Reconhece MHC-I. Induz morte celular programada (apoptose) em células infectadas por vírus ou tumorais usando perforinas e granzimas.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Imunidade Humoral (Linfócitos B e Anticorpos):</strong>
+                        <ul>
+                            <li><em>IgM:</em> Pentâmero, resposta aguda e primária.</li>
+                            <li><em>IgG:</em> Alta afinidade, menor, atravessa placenta. Principal da fase de memória.</li>
+                            <li><em>IgA:</em> Dimérica, presente nas mucosas, saliva e leite materno.</li>
+                            <li><em>IgE:</em> Atua contra helmintos (parasitas) e é central nas alergias (asma, anafilaxia).</li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
 
+            <!-- Flashcards -->
             <div id="adap-flash" class="tab-content">
                 <p class="hint">Clique nos cartões para revelar a resposta</p>
                 <div class="flashcard-grid">
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Diferencie a ação do Linfócito T CD4+ e do Linfócito T CD8+.</div>
-                            <div class="flashcard-back">CD4+ (Auxiliar): Coordena e ativa outras células do sistema imune via citocinas.<br><br>CD8+ (Citotóxico): Mata diretamente células infectadas por vírus ou tumorais.</div>
+                            <div class="flashcard-front">Regra de Ouro: MHC-I interage com qual Linfócito e MHC-II com qual Linfócito?</div>
+                            <div class="flashcard-back">Regra do 8 (multiplicação):<br>MHC-I interage com CD8 (1x8 = 8).<br>MHC-II interage com CD4 (2x4 = 8).</div>
                         </div>
                     </div>
                     <div class="flashcard" onclick="this.classList.toggle('flipped')">
                         <div class="flashcard-inner">
-                            <div class="flashcard-front">Na sorologia, o que significa ter IgM reagente e IgG não reagente?</div>
-                            <div class="flashcard-back">Indica uma infecção aguda (recente), pois o IgM é o primeiro anticorpo produzido antes que ocorra a troca de classe para IgG (fase de memória).</div>
+                            <div class="flashcard-front">Qual o principal anticorpo transferido da mãe para o bebê via amamentação (leite materno) e via placentária?</div>
+                            <div class="flashcard-back">Via placenta (gestação): IgG.<br>Via leite materno e colostro: IgA (proteção das mucosas).</div>
                         </div>
                     </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">Como o Linfócito T CD8+ mata uma célula alvo infectada por vírus?</div>
+                            <div class="flashcard-back">Ele libera grânulos contendo Perforinas (perfuram a membrana da célula alvo) e Granzimas (entram pelo poro e ativam a cascata das caspases, forçando a apoptose celular).</div>
+                        </div>
+                    </div>
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">O que faz uma Célula Dendrítica (APC)?</div>
+                            <div class="flashcard-back">Ela captura antígenos no local da infecção, os processa, viaja até um órgão linfoide secundário (linfonodo) e apresenta esse antígeno na forma de peptídeo+MHC para ativar linfócitos T virgens (naïves).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div id="adap-quiz" class="tab-content">
+                <div class="quiz-container">
+                    <p class="quiz-question">1. O vírus HIV causa imunodeficiência profunda porque ataca e destrói primariamente uma população específica de células, desorganizando toda a resposta imune. Qual é essa célula e qual MHC ela reconhece?</p>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">A) Linfócito T CD8+ / reconhece MHC-I</button>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">B) Linfócito T CD4+ / reconhece MHC-II</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">C) Célula Dendrítica / reconhece MHC-I</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) Linfócito B / reconhece MHC-II</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> O HIV infecta preferencialmente o Linfócito T CD4+ (Helper). Como esta célula é o "maestro" que produz citocinas ativando tanto macrófagos quanto linfócitos B e T CD8, sua falta colapsa todo o sistema. T CD4+ reconhece antígenos apresentados via MHC classe II.</div>
+                </div>
+                <div class="quiz-container">
+                    <p class="quiz-question">2. Durante um exame de sangue de rotina de uma pessoa altamente alérgica (asma brônquica e rinite severa crônica), espera-se observar, em teoria, níveis elevados de qual imunoglobulina (anticorpo) e de qual célula mieloide?</p>
+                    <button class="quiz-btn" data-correct="true" onclick="checkAnswer(this)">A) IgE e Eosinófilos.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">B) IgM e Neutrófilos.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">C) IgG e Monócitos.</button>
+                    <button class="quiz-btn" onclick="checkAnswer(this)">D) IgA e Linfócitos T CD8+.</button>
+                    <div class="quiz-explanation"><strong>Comentário:</strong> A Imunoglobulina E (IgE) é fundamental na resposta alérgica (e contra parasitas). Ela se liga fortemente a mastócitos e eosinófilos. Portanto, indivíduos atópicos/alérgicos costumam ter alta produção de IgE e eosinofilia sanguínea.</div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Script de Interação -->
+    <!-- Scripts de Interação -->
     <script>
-        // Função para alternar os tópicos no menu lateral
+        // Função para alternar tópicos no menu
         function showTopic(topicId) {
-            // Esconde todas as seções
             document.querySelectorAll('.topic-section').forEach(section => {
                 section.classList.remove('active');
             });
             
-            // Remove a classe 'active' de todos os botões do menu lateral
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Mostra a seção escolhida e marca o botão correspondente
             document.getElementById(topicId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // Função para alternar entre Resumo e Flashcard dentro de um tópico
+        // Função para alternar abas internas
         function switchTab(btn, targetId) {
             const tabsContainer = btn.parentElement;
             const topicSection = tabsContainer.parentElement;
 
-            // Remove active dos botões (dentro deste tópico)
             tabsContainer.querySelectorAll('.tab-btn').forEach(b => {
                 b.classList.remove('active');
             });
 
-            // Esconde todo o conteúdo de aba (dentro deste tópico)
             topicSection.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
 
-            // Ativa o botão clicado e a aba correspondente
             btn.classList.add('active');
             document.getElementById(targetId).classList.add('active');
+        }
+
+        // Lógica do Quiz Interativo
+        function checkAnswer(clickedBtn) {
+            const quizContainer = clickedBtn.parentElement;
+            const buttons = quizContainer.querySelectorAll('.quiz-btn');
+            const explanation = quizContainer.querySelector('.quiz-explanation');
+
+            // Desativa todos os botões dessa pergunta para evitar múltiplos cliques
+            buttons.forEach(btn => {
+                btn.disabled = true;
+            });
+
+            // Verifica se a resposta está correta
+            if (clickedBtn.dataset.correct === "true") {
+                clickedBtn.classList.add('correct');
+            } else {
+                clickedBtn.classList.add('wrong');
+                // Mostra ao usuário qual era a resposta verdadeira pintando-a de verde
+                buttons.forEach(btn => {
+                    if (btn.dataset.correct === "true") {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            // Exibe a explicação
+            if (explanation) {
+                explanation.classList.add('show');
+            }
         }
     </script>
 </body>
